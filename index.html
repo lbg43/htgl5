@@ -134,8 +134,8 @@
     <script>
         const DEFAULT_USERNAME = 'admin';
         const DEFAULT_PASSWORD = 'admin123';
-        // 修改为Cloudflare Worker URL
-        const WORKER_URL = 'https://hidden-term-8dda.vickippankeyz66.workers.dev/';
+        // 修改为Cloudflare Worker URL - 移除末尾斜杠
+        const WORKER_URL = 'https://hidden-term-8dda.vickippankeyz66.workers.dev';
 
         const loginForm = document.getElementById('loginForm');
         const errorMessage = document.getElementById('errorMessage');
@@ -207,8 +207,12 @@
                 const passwordResponse = await fetch(`${WORKER_URL}/api`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
+                    mode: 'cors',
+                    credentials: 'omit',
                     body: JSON.stringify({
                         type: 'getPassword'
                     })
@@ -253,8 +257,12 @@
                 const response = await fetch(`${WORKER_URL}/getMe`, {
                     method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    mode: 'cors',
+                    credentials: 'omit'
                 });
                 
                 if (response.ok) {
@@ -273,8 +281,12 @@
                         const registerResponse = await fetch(`${WORKER_URL}/session/register`, {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
+                            mode: 'cors',
+                            credentials: 'omit',
                             body: JSON.stringify({
                                 sessionId: sessionId,
                                 username: username
@@ -328,8 +340,12 @@
                     fetch(`${WORKER_URL}/session/register`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
                         },
+                        mode: 'cors',
+                        credentials: 'omit',
                         body: JSON.stringify({
                             sessionId: sessionId,
                             username: username
