@@ -265,6 +265,10 @@
         <button class="btn btn-primary" onclick="changePage('prev')" id="prev-page">上一页</button>
         <span id="page-info" style="margin: 0 15px;">第 1 页</span>
         <button class="btn btn-primary" onclick="changePage('next')" id="next-page">下一页</button>
+        <span style="margin: 0 15px;">
+            <input type="number" id="goto-page-input" min="1" style="width: 60px; padding: 6px; text-align: center;" placeholder="页码">
+            <button class="btn btn-primary" onclick="gotoSpecificPage()" style="margin-left: 5px;">跳转</button>
+        </span>
     </div>
 </div>
         <!-- 在系统设置标签页中移除修改密码和Worker URL部分 -->
@@ -510,6 +514,17 @@
                         if (event.key === 'Enter') {
                             event.preventDefault();
                             searchUsers();
+                        }
+                    });
+                }
+                
+                // 为页码跳转输入框添加回车键事件监听
+                const gotoPageInput = document.getElementById('goto-page-input');
+                if (gotoPageInput) {
+                    gotoPageInput.addEventListener('keypress', function(event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            gotoSpecificPage();
                         }
                     });
                 }
@@ -1198,9 +1213,55 @@
                 nextButton.disabled = currentPage >= totalPages;
 
                 document.getElementById('page-info').textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+                
+                // 更新跳转页码输入框的最大值
+                const gotoPageInput = document.getElementById('goto-page-input');
+                if (gotoPageInput) {
+                    gotoPageInput.max = totalPages;
+                    gotoPageInput.placeholder = `1-${totalPages}`;
+                }
 
                 // 始终显示分页控件
                 document.querySelector('.pagination').style.display = 'block';
+            }
+            
+            // 跳转到指定页码
+            function gotoSpecificPage() {
+                const input = document.getElementById('goto-page-input');
+                let pageNum = parseInt(input.value);
+                const totalPages = Math.ceil(totalUsers / pageSize) || 1;
+                
+                // 验证输入是否有效
+                if (isNaN(pageNum) || pageNum < 1) {
+                    log('请输入有效的页码');
+                    input.value = '';
+                    return;
+                }
+                
+                // 限制页码范围
+                pageNum = Math.max(1, Math.min(pageNum, totalPages));
+                
+                // 如果是当前页，无需操作
+                if (pageNum === currentPage) {
+                    input.value = '';
+                    return;
+                }
+                
+                // 设置当前页
+                currentPage = pageNum;
+                
+                // 更新页码显示
+                document.getElementById('page-info').textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+                
+                // 加载指定页数据
+                if (window.currentSearchKeyword) {
+                    searchUsersPage(window.currentSearchKeyword, currentPage);
+                } else {
+                    loadUsers(currentPage);
+                }
+                
+                // 清空输入框
+                input.value = '';
             }
                 
                                // 实时更新
